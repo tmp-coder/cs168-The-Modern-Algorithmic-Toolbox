@@ -2,45 +2,10 @@ import pandas as pd
 import numpy as np
 
 from makeHeatMap import makeHeatMap
+from similarity import JaccardSimilarity,L2Similarity,cosSimilarity
+from utils import read_data
 
-dataPath = 'p2_data/'
-
-
-def read_data():
-    groupFilePath = dataPath + 'groups.csv'
-    dataFilePath = dataPath + 'data50.csv'
-    labelFilePath = dataPath +'label.csv'
-    
-    group = pd.read_csv(groupFilePath,header=None)
-    rawData = pd.read_csv(dataFilePath,header=None).values
-    labels = pd.read_csv(labelFilePath,header=None)
-
-    artMat = np.zeros((rawData[:,0].max(),rawData[:,1].max()))
-    groupedArticles = [ values for values in labels.groupby(0).groups.values()]
-
-    for artId,wordId,count in rawData:
-        artMat[artId - 1][wordId -1] = count
-
-
-    return artMat,groupedArticles,group
-
-
-
-def JaccardSimilarity(y1,y2):
-    
-    mi = np.min([y1,y2],axis=0)
-    ma = np.max([y1,y2],axis=0)
-
-    return np.sum(mi)/np.sum(ma)
-
-def L2Similarity(y1,y2):
-    return -np.linalg.norm(y1-y2)
-
-def cosSimilarity(y1,y2):
-    return y1.dot(y2) / (np.linalg.norm(y1) * np.linalg.norm(y2))
-
-
-arts,groupedArts,groups = read_data()
+arts,groupedArts,groups,_ = read_data()
 
 def similarityMatrix(similarityFun):
     mat = np.zeros((len(groupedArts),len(groupedArts)))
